@@ -33,42 +33,35 @@ export async function deleteOrder(req, res) {
 }
 
 export async function addOrder(req, res) {
-	var { loggedinUser } = req
-	console.log("🚀 ~ addOrder ~ loggedinUser:", loggedinUser)
+	// var { loggedinUser } = req
 
 	try {
-		var { order } = req.body
-		console.log("🚀 ~ addOrder ~ order:", order)
+		var order = req.body
 		// const { aboutStayId } = stay._id
 		// order.guest._id = loggedinUser._id
 		order = await orderService.add(order)
 
-		// Give the user credit for adding a order
-		// var user = await userService.getById(order.byUserId)
-		// user.score += 10
-
-		loggedinUser.score += 10
-		await userService.update(loggedinUser)
+		// await userService.update(loggedinUser)
 
 		// Update user score in login token as well
 
-		const loginToken = authService.getLoginToken(loggedinUser)
-		res.cookie('loginToken', loginToken)
+		// const loginToken = authService.getLoginToken(loggedinUser)
+		// res.cookie('loginToken', loginToken)
 
 		// prepare the updated order for sending out
 
-		order.byUser = loggedinUser
-		order.aboutUser = await userService.getById(aboutUserId)
+		// order.byUser = loggedinUser
+		// order.aboutUser = await userService.getById(aboutUserId)
 
-		delete order.aboutUser.givenOrders
-		delete order.aboutUserId
-		delete order.byUserId
+		// delete order.aboutUser.givenOrders
+		// delete order.aboutUserId
+		// delete order.byUserId
 
-		socketService.broadcast({ type: 'order-added', data: order, userId: loggedinUser._id })
-		socketService.emitToUser({ type: 'order-about-you', data: order, userId: order.aboutUser._id })
+		// socketService.broadcast({ type: 'order-added', data: order, userId: loggedinUser._id })
+		// socketService.emitToUser({ type: 'order-about-you', data: order, userId: order.aboutUser._id })
 
-		const fullUser = await userService.getById(loggedinUser._id)
-		socketService.emitTo({ type: 'user-updated', data: fullUser, label: fullUser._id })
+		// const fullUser = await userService.getById(loggedinUser._id)
+		// socketService.emitTo({ type: 'user-updated', data: fullUser, label: fullUser._id })
 
 		res.send(order)
 	} catch (err) {
