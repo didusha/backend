@@ -7,7 +7,15 @@ import { orderService } from './order.service.js'
 export async function getOrders(req, res) {
 	try {
 		const orders = await orderService.query(req.query)
-		res.send(orders)
+
+		const ordersToReturn = orders.map(order => {
+			const timestamp = order._id.getTimestamp() 
+			return {
+				...order,
+				createdAt: timestamp
+			}
+		})
+		res.send(ordersToReturn)
 	} catch (err) {
 		logger.error('Cannot get orders', err)
 		res.status(400).send({ err: 'Failed to get orders' })
@@ -74,12 +82,12 @@ export async function addOrder(req, res) {
 export async function updateOrder(req, res) {
 	const { loggedinUser, body: order } = req
 	const { _id: userId, isAdmin } = loggedinUser
-	
+
 	// if (!isAdmin && order.guest._id !== userId) {
 	// 	res.status(403).send('Not your order...')
 	// 	return
 	// }
-	
+
 	console.log("🚀 ~ updateOrder ~ order:", order)
 	try {
 		const updatedOrder = await orderService.update(order)

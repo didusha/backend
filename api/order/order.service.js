@@ -8,11 +8,11 @@ import { type } from 'os'
 export const orderService = { query, remove, add, update }
 
 async function query(filterBy = {}) {
-    
+
   try {
     const criteria = _buildCriteria(filterBy)
     const sort = _buildSort(filterBy)
-    
+
     const collection = await dbService.getCollection('order')
 
     var orders = await collection.find(criteria, { sort }).toArray()
@@ -79,40 +79,40 @@ async function remove(orderId) {
 }
 
 async function add(order) {
-    try {
-        const orderToAdd = {
-            host: {
-                _id: ObjectId.createFromHexString(order.host._id),
-                fullname: order.host.fullname,
-                pictureUrl: order.host.pictureUrl,
-            },
-            guest: {
-                _id: ObjectId.createFromHexString(order.guest._id),
-                fullname: order.guest.fullname,
-                imgUrl: order.guest.imgUrl
-            },
-            capacity: order.capacity,
-            totalPrice: order.totalPrice,
-            startDate: new Date(order.startDate),
-            endDate: new Date(order.endDate),
-            guests: {
-                adults: order.guests.adults,
-                children: order.guests.children,
-                infants: order.guests.infants,
-                pets: order.guests.pets,
-            },
-            stay: {
-                _id: ObjectId.createFromHexString(order.stay._id),
-                name: order.stay.name,
-                price: order.stay.price,
-                imgUrls: order.stay.imgUrls
-            },
-            msgs: order.msgs,
-            status: order.status
-        }
-        console.log("🚀 ~ add ~ orderToAdd:", orderToAdd)
-        const collection = await dbService.getCollection('order')
-        await collection.insertOne(orderToAdd)
+  try {
+    const orderToAdd = {
+      host: {
+        _id: ObjectId.createFromHexString(order.host._id),
+        fullname: order.host.fullname,
+        pictureUrl: order.host.pictureUrl,
+      },
+      guest: {
+        _id: ObjectId.createFromHexString(order.guest._id),
+        fullname: order.guest.fullname,
+        imgUrl: order.guest.imgUrl
+      },
+      capacity: order.capacity,
+      totalPrice: order.totalPrice,
+      startDate: new Date(order.startDate),
+      endDate: new Date(order.endDate),
+      guests: {
+        adults: order.guests.adults,
+        children: order.guests.children,
+        infants: order.guests.infants,
+        pets: order.guests.pets,
+      },
+      stay: {
+        _id: ObjectId.createFromHexString(order.stay._id),
+        name: order.stay.name,
+        price: order.stay.price,
+        imgUrls: order.stay.imgUrls
+      },
+      msgs: order.msgs,
+      status: order.status
+    }
+    console.log("🚀 ~ add ~ orderToAdd:", orderToAdd)
+    const collection = await dbService.getCollection('order')
+    await collection.insertOne(orderToAdd)
 
     return orderToAdd
   } catch (err) {
@@ -155,13 +155,17 @@ function _buildCriteria(filterBy) {
 }
 
 function _buildSort(filterBy) {
-    if (!filterBy.type) return {}
-    let type = filterBy.type   
+  if (!filterBy.type) return {}
+  let type = filterBy.type
 
-    if (type === 'name'){
-        type = 'stay.name'
-    }
+  if (type === 'name') {
+    type = 'stay.name'
+  }
 
-  const dir = +filterBy.dir 
+  if (type === 'createdAt') {
+    type = '_id'
+  }
+
+  const dir = +filterBy.dir
   return { [type]: dir }
 }
