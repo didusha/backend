@@ -7,6 +7,7 @@ import { dbService } from '../../services/db.service.js'
 export const orderService = { query, remove, add, update }
 
 async function query(filterBy = {}) {
+    console.log("🚀 ~ query ~ filterBy:", filterBy)
     try {
         const criteria = _buildCriteria(filterBy)
         const collection = await dbService.getCollection('order')
@@ -87,6 +88,7 @@ async function add(order) {
                 fullname: order.guest.fullname,
                 imgUrl: order.guest.imgUrl
             },
+            capacity: order.capacity,
             totalPrice: order.totalPrice,
             startDate: new Date(order.startDate),
             endDate: new Date(order.endDate),
