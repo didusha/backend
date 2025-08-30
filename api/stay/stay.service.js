@@ -20,7 +20,6 @@ async function query(filterBy = { txt: '', capacity: 1 }, sortBy) {
 	try {
 		const criteria = _buildCriteria(filterBy)
 		const sort = _buildSort(sortBy)
-		console.log("🚀 ~ query ~ sort:", sort)
 
 		const collection = await dbService.getCollection('stay')
 		var stayCursor = await collection.find(criteria, {sort})
@@ -51,10 +50,8 @@ function _buildCriteria(filterBy) {
 }
 
 function _buildSort(sortBy) {
-    // console.log("🚀 ~ _buildSort ~ sortBy:", sortBy)
     if (!sortBy.type) return {}
     let type = sortBy.type   
-    // console.log("🚀 ~ _buildSort ~ type:", type)
 
   const dir = +sortBy.dir 
   return { [type]: dir }
