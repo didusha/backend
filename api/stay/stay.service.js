@@ -16,13 +16,14 @@ export const stayService = {
 	// removeStayMsg,
 }
 
-async function query(filterBy = { txt: '', capacity: 1 }) {
+async function query(filterBy = { txt: '', capacity: 1 }, sortBy) {
 	try {
 		const criteria = _buildCriteria(filterBy)
-		// const sort = _buildSort(filterBy)
+		const sort = _buildSort(sortBy)
+		console.log("🚀 ~ query ~ sort:", sort)
 
 		const collection = await dbService.getCollection('stay')
-		var stayCursor = await collection.find(criteria)
+		var stayCursor = await collection.find(criteria, {sort})
 
 		// if (filterBy.pageIdx !== undefined) {
 		// 	stayCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
@@ -41,12 +42,21 @@ function _buildCriteria(filterBy) {
 		name: { $regex: filterBy.txt, $options: 'i' },
 		capacity: { $gte: filterBy.capacity },
 	}
-	
+
 	if (filterBy.hostId && filterBy.hostId !== '') {
 	   criteria['host._id'] = ObjectId.createFromHexString(filterBy.hostId)
    }
-	console.log("🚀 ~ _buildCriteria ~ criteria:", criteria)
 	return criteria
+}
+
+function _buildSort(sortBy) {
+    // console.log("🚀 ~ _buildSort ~ sortBy:", sortBy)
+    if (!sortBy.type) return {}
+    let type = sortBy.type   
+    // console.log("🚀 ~ _buildSort ~ type:", type)
+
+  const dir = +sortBy.dir 
+  return { [type]: dir }
 }
 
 async function getById(stayId) {
