@@ -39,7 +39,8 @@ async function query(filterBy = { txt: '', capacity: 1 }, sortBy) {
 
 function _buildCriteria(filterBy) {
 	const criteria = {
-		name: { $regex: filterBy.txt, $options: 'i' },
+		// name: { $regex: filterBy.txt, $options: 'i' },
+		'loc.city': { $regex: filterBy.txt, $options: 'i' },
 		capacity: { $gte: filterBy.capacity },
 	}
 
