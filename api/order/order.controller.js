@@ -37,7 +37,8 @@ export async function addOrder(req, res) {
 
 	try {
 		var order = req.body
-		// const { aboutStayId } = stay._id
+		// console.log("🚀 ~ addOrder ~ order:", order)
+		// const { aboutOrderId } = order._id
 		// order.guest._id = loggedinUser._id
 		order = await orderService.add(order)
 
@@ -67,5 +68,24 @@ export async function addOrder(req, res) {
 	} catch (err) {
 		logger.error('Failed to add order', err)
 		res.status(400).send({ err: 'Failed to add order' })
+	}
+}
+
+export async function updateOrder(req, res) {
+	const { loggedinUser, body: order } = req
+	const { _id: userId, isAdmin } = loggedinUser
+	
+	// if (!isAdmin && order.guest._id !== userId) {
+	// 	res.status(403).send('Not your order...')
+	// 	return
+	// }
+	
+	console.log("🚀 ~ updateOrder ~ order:", order)
+	try {
+		const updatedOrder = await orderService.update(order)
+		res.json(updatedOrder)
+	} catch (err) {
+		logger.error('Failed to update order', err)
+		res.status(400).send({ err: 'Failed to update order' })
 	}
 }

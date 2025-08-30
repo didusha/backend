@@ -12,8 +12,8 @@ export const stayService = {
 	getById,
 	add,
 	update,
-	addStayMsg,
-	removeStayMsg,
+	// addStayMsg,
+	// removeStayMsg,
 }
 
 async function query(filterBy = { txt: '', capacity: 1 }) {
@@ -41,6 +41,11 @@ function _buildCriteria(filterBy) {
 		name: { $regex: filterBy.txt, $options: 'i' },
 		capacity: { $gte: filterBy.capacity },
 	}
+	
+	if (filterBy.hostId && filterBy.hostId !== '') {
+	   criteria['host._id'] = ObjectId.createFromHexString(filterBy.hostId)
+   }
+	console.log("🚀 ~ _buildCriteria ~ criteria:", criteria)
 	return criteria
 }
 
@@ -125,34 +130,34 @@ async function update(stay) {
 }
 
 
-async function addStayMsg(stayId, msg) {
-	try {
-		const criteria = { _id: ObjectId.createFromHexString(stayId) }
-		msg.id = makeId()
+// async function addStayMsg(stayId, msg) {
+// 	try {
+// 		const criteria = { _id: ObjectId.createFromHexString(stayId) }
+// 		msg.id = makeId()
 
-		const collection = await dbService.getCollection('stay')
-		await collection.updateOne(criteria, { $push: { msgs: msg } })
+// 		const collection = await dbService.getCollection('stay')
+// 		await collection.updateOne(criteria, { $push: { msgs: msg } })
 
-		return msg
-	} catch (err) {
-		logger.error(`cannot add stay msg ${stayId}`, err)
-		throw err
-	}
-}
+// 		return msg
+// 	} catch (err) {
+// 		logger.error(`cannot add stay msg ${stayId}`, err)
+// 		throw err
+// 	}
+// }
 
-async function removeStayMsg(stayId, msgId) {
-	try {
-		const criteria = { _id: ObjectId.createFromHexString(stayId) }
+// async function removeStayMsg(stayId, msgId) {
+// 	try {
+// 		const criteria = { _id: ObjectId.createFromHexString(stayId) }
 
-		const collection = await dbService.getCollection('stay')
-		await collection.updateOne(criteria, { $pull: { msgs: { id: msgId } } })
+// 		const collection = await dbService.getCollection('stay')
+// 		await collection.updateOne(criteria, { $pull: { msgs: { id: msgId } } })
 
-		return msgId
-	} catch (err) {
-		logger.error(`cannot remove stay msg ${stayId}`, err)
-		throw err
-	}
-}
+// 		return msgId
+// 	} catch (err) {
+// 		logger.error(`cannot remove stay msg ${stayId}`, err)
+// 		throw err
+// 	}
+// }
 
 
 // function _buildSort(filterBy) {

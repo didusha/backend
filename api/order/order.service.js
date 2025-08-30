@@ -4,7 +4,7 @@ import { asyncLocalStorage } from '../../services/als.service.js'
 import { logger } from '../../services/logger.service.js'
 import { dbService } from '../../services/db.service.js'
 
-export const orderService = { query, remove, add }
+export const orderService = { query, remove, add, update }
 
 async function query(filterBy = {}) {
     try {
@@ -85,6 +85,7 @@ async function add(order) {
             guest: {
                 _id: ObjectId.createFromHexString(order.guest._id),
                 fullname: order.guest.fullname,
+                imgUrl: order.guest.imgUrl
             },
             totalPrice: order.totalPrice,
             startDate: new Date(order.startDate),
@@ -115,6 +116,26 @@ async function add(order) {
     }
 }
 
+async function update(order) {
+    const orderToSave = {
+        status: order.status
+    }
+
+    try {
+        const criteria = { _id: ObjectId.createFromHexString(order._id) }
+        // console.log("🚀 ~ update ~ criteria:", criteria)
+
+        const collection = await dbService.getCollection('order')
+        await collection.updateOne(criteria, { $set: orderToSave })
+
+        const updatedOrder = await collection.findOne(criteria)
+        return updatedOrder
+    } catch (err) {
+        logger.error(`cannot update order ${order._id}`, err)
+        throw err
+    }
+}
+
 function _buildCriteria(filterBy) {
     const criteria = {}
 
@@ -122,7 +143,7 @@ function _buildCriteria(filterBy) {
         criteria['host._id'] = ObjectId.createFromHexString(filterBy.hostId)
     }
 
-    if (filterBy.guestId  && filterBy.guestId !== 'undefined') {
+    if (filterBy.guestId && filterBy.guestId !== 'undefined') {
         criteria['guest._id'] = ObjectId.createFromHexString(filterBy.guestId)
     }
 

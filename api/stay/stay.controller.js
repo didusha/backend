@@ -7,6 +7,7 @@ export async function getStays(req, res) {
 		const filterBy = {
 			txt: req.query.txt || '',
 			capacity: +req.query.capacity || 1,
+			hostId:req.query.hostId || '',
 		}
 		const stays = await stayService.query(filterBy)
 		res.json(stays)
@@ -28,44 +29,46 @@ export async function getStayById(req, res) {
 }
 
 export async function addStay(req, res) {
-	const { loggedinUser, body } = req
-	const stay = {
-		name: body.name,
-		type: body.type,
-		imgUrls: body.imgUrls,
-		price: body.price,
-		summary: body.summary,
-		capacity: body.capacity,
-		amenities: body.amenities,
-		bathrooms: body.bathrooms,
-		bedrooms: body.bedrooms,
-		roomType: body.roomType,
-		loc: {
-			country: body.loc.country,
-			city: body.loc.city,
-			address: body.loc.address,
-			lat: body.loc.lat,
-			lan: body.loc.lan,
-		},
-		reviews: body.reviews,
-		likedByUsers: body.likedByUsers,
-	}
-	try {
-		stay.host = {
-			_id: ObjectId.createFromHexString(loggedinUser._id),
-			fullname: loggedinUser.fullname,
-			location: body.host.location,
-			about: body.host.about,
-			responseTime: 'within an hour',
-			pictureUrl: body.host.pictureUrl,
-			isHost: true,
-		}
-		const addedStay = await stayService.add(stay)
-		res.json(addedStay)
-	} catch (err) {
-		logger.error('Failed to add stay', err)
-		res.status(400).send({ err: 'Failed to add stay' })
-	}
+  const { loggedinUser, body } = req
+
+  try {
+    const stay = {
+      name: body.name,
+      type: body.type,
+      imgUrls: body.imgUrls,
+      price: body.price,
+      summary: body.summary,
+      capacity: body.capacity,
+      amenities: body.amenities,
+      bathrooms: body.bathrooms,
+      bedrooms: body.bedrooms,
+      roomType: body.roomType,
+      loc: {
+        country: body.loc?.country || '',
+        city: body.loc?.city || '',
+        address: body.loc?.address || '',
+        lat: body.loc?.lat || 0,
+        lng: body.loc?.lng || 0, 
+      },
+      reviews: body.reviews || [],
+      likedByUsers: body.likedByUsers || [],
+      host: {
+        _id: ObjectId.createFromHexString(loggedinUser._id),
+        fullname: loggedinUser.fullname,
+        location: body.host?.location || '',
+        about: body.host?.about || '',
+        responseTime: 'within an hour',
+        pictureUrl: body.host?.pictureUrl || '',
+        isHost: true,
+      },
+    }
+
+    const addedStay = await stayService.add(stay)
+    res.json(addedStay)
+  } catch (err) {
+    logger.error('Failed to add stay', err)
+    res.status(400).send({ err: 'Failed to add stay' })
+  }
 }
 
 export async function updateStay(req, res) {
