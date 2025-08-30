@@ -8,6 +8,7 @@ import { type } from 'os'
 export const orderService = { query, remove, add, update }
 
 async function query(filterBy = {}) {
+    
   try {
     const criteria = _buildCriteria(filterBy)
     const sort = _buildSort(filterBy)
@@ -154,10 +155,13 @@ function _buildCriteria(filterBy) {
 }
 
 function _buildSort(filterBy) {
-    if (!filterBy.type) return {}    
+    if (!filterBy.type) return {}
+    let type = filterBy.type   
+
     if (type === 'name'){
         type = 'stay.name'
-    }    
+    }
+
   const dir = +filterBy.dir 
   return { [type]: dir }
 }
