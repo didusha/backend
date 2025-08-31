@@ -85,7 +85,7 @@ async function update(user) {
         const userToSave = {
             _id: ObjectId.createFromHexString(user._id), // needed for the returnd obj
             fullname: user.fullname,
-            score: user.score,
+            wishlist: user.wishlist,
         }
         const collection = await dbService.getCollection('user')
         await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
@@ -105,7 +105,8 @@ async function add(user) {
 			fullname: user.fullname,
 			imgUrl: user.imgUrl,
 			isAdmin: user.isAdmin,
-			score: 100,
+            isHost: user.isHost,
+            wishlist: user.wishlist,
 		}
 		const collection = await dbService.getCollection('user')
 		await collection.insertOne(userToAdd)
@@ -129,8 +130,6 @@ function _buildCriteria(filterBy) {
 			},
 		]
 	}
-	if (filterBy.minBalance) {
-		criteria.score = { $gte: filterBy.minBalance }
-	}
+
 	return criteria
 }
