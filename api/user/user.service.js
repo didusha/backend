@@ -84,8 +84,13 @@ async function update(user) {
         // peek only updatable properties
         const userToSave = {
             _id: ObjectId.createFromHexString(user._id),
-            fullname: user.fullname,
-            wishlist: user.wishlist,
+            username: user.username || '',
+            fullname: user.fullname || '',
+			password: user.password || '',
+            imgUrl: user.imgUrl || '',
+			isAdmin: user.isAdmin || false,
+            isHost: user.isHost || false,
+            wishlist: user.wishlist || [],
         }
         const collection = await dbService.getCollection('user')
         await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
