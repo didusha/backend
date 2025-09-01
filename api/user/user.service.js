@@ -81,15 +81,10 @@ async function remove(userId) {
 
 async function update(user) {
     try {
-        // peek only updatable properties
+        // only update wishlist
         const userToSave = {
             _id: ObjectId.createFromHexString(user._id),
-            username: user.username || '',
-            fullname: user.fullname || '',
-            imgUrl: user.imgUrl || '',
-			isAdmin: user.isAdmin || false,
-            isHost: user.isHost || false,
-            wishlist: user.wishlist || [],
+            wishlist: user.wishlist || [], 
         }
         const collection = await dbService.getCollection('user')
         await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
