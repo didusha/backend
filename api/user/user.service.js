@@ -1,15 +1,15 @@
-import {dbService} from '../../services/db.service.js'
-import {logger} from '../../services/logger.service.js'
-import {orderService} from '../order/order.service.js'
+import { dbService } from '../../services/db.service.js'
+import { logger } from '../../services/logger.service.js'
+import { orderService } from '../order/order.service.js'
 import { ObjectId } from 'mongodb'
 
 export const userService = {
-	add, // Create (Signup)
-	getById, // Read (Profile page)
-	update, // Update (Edit profile)
-	remove, // Delete (remove user)
-	query, // List (of users)
-	getByUsername, // Used for Login
+    add, // Create (Signup)
+    getById, // Read (Profile page)
+    update, // Update (Edit profile)
+    remove, // Delete (remove user)
+    query, // List (of users)
+    getByUsername, // Used for Login
 }
 
 async function query(filterBy = {}) {
@@ -43,7 +43,7 @@ async function getById(userId) {
 
         user.givenOrders = await orderService.query(criteria)
         console.log(user.givenOrders)
-        
+
         user.givenOrders = user.givenOrders.map(order => {
             delete order.byUser
             return order
@@ -57,14 +57,14 @@ async function getById(userId) {
 }
 
 async function getByUsername(username) {
-	try {
-		const collection = await dbService.getCollection('user')
-		const user = await collection.findOne({ username })
-		return user
-	} catch (err) {
-		logger.error(`while finding user by username: ${username}`, err)
-		throw err
-	}
+    try {
+        const collection = await dbService.getCollection('user')
+        const user = await collection.findOne({ username })
+        return user
+    } catch (err) {
+        logger.error(`while finding user by username: ${username}`, err)
+        throw err
+    }
 }
 
 async function remove(userId) {
@@ -84,11 +84,13 @@ async function update(user) {
         // only update wishlist
         const userToSave = {
             _id: ObjectId.createFromHexString(user._id),
-            wishlist: user.wishlist || [], 
+            wishlist: user.wishlist || [],
         }
         const collection = await dbService.getCollection('user')
         await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
-        return userToSave
+
+        const updatedUser = await collection.findOne({ _id: ObjectId.createFromHexString(user._id) })
+        return updatedUser
     } catch (err) {
         logger.error(`cannot update user ${user._id}`, err)
         throw err
@@ -96,39 +98,39 @@ async function update(user) {
 }
 
 async function add(user) {
-	try {
-		// peek only updatable fields!
-		const userToAdd = {
-			username: user.username || '',
-			password: user.password || '',
-			fullname: user.fullname || '',
-			imgUrl: user.imgUrl || '',
-			isAdmin: user.isAdmin || false,
+    try {
+        // peek only updatable fields!
+        const userToAdd = {
+            username: user.username || '',
+            password: user.password || '',
+            fullname: user.fullname || '',
+            imgUrl: user.imgUrl || '',
+            isAdmin: user.isAdmin || false,
             isHost: user.isHost || false,
             wishlist: user.wishlist || [],
-		}
-		const collection = await dbService.getCollection('user')
-		await collection.insertOne(userToAdd)
-		return userToAdd
-	} catch (err) {
-		logger.error('cannot add user', err)
-		throw err
-	}
+        }
+        const collection = await dbService.getCollection('user')
+        await collection.insertOne(userToAdd)
+        return userToAdd
+    } catch (err) {
+        logger.error('cannot add user', err)
+        throw err
+    }
 }
 
 function _buildCriteria(filterBy) {
-	const criteria = {}
-	if (filterBy.txt) {
-		const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
-		criteria.$or = [
-			{
-				username: txtCriteria,
-			},
-			{
-				fullname: txtCriteria,
-			},
-		]
-	}
+    const criteria = {}
+    if (filterBy.txt) {
+        const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
+        criteria.$or = [
+            {
+                username: txtCriteria,
+            },
+            {
+                fullname: txtCriteria,
+            },
+        ]
+    }
 
-	return criteria
+    return criteria
 }
