@@ -1,3 +1,35 @@
+import { dbService } from '../backend/services/db.service.js'
+
+async function addWishlistToUsers() {
+  try {
+    const collection = await dbService.getCollection('user')
+    const users = await collection.find({}).toArray()
+
+    let updatedCount = 0
+
+    for (const user of users) {
+      // Only update if wishlist is missing
+      if (!user.wishlist) {
+        await collection.updateOne(
+          { _id: user._id },
+          { $set: { wishlist: [] } }
+        )
+        updatedCount++
+      }
+    }
+
+    console.log(`✅ Added wishlist to ${updatedCount} users successfully.`)
+  } catch (err) {
+    console.error("❌ Error updating users with wishlist:", err)
+  }
+}
+
+addWishlistToUsers()
+  .then(() => process.exit(0))
+  .catch(() => process.exit(1))
+
+
+
 // import { dbService } from '../backend/services/db.service.js'
 
 // async function updateStayLocations() {
@@ -130,26 +162,26 @@
 //   }
 // }
 
-import { dbService } from '../backend/services/db.service.js'
+// import { dbService } from '../backend/services/db.service.js'
 
-async function mapCities() {
-  try {
-    const collection = await dbService.getCollection('stay')
-    const stays = await collection.find({}).toArray()
+// async function mapCities() {
+//   try {
+//     const collection = await dbService.getCollection('stay')
+//     const stays = await collection.find({}).toArray()
 
-    const cityMap = stays.reduce((acc, stay) => {
-      const city = stay.loc?.city || 'Unknown'
-      acc[city] = (acc[city] || 0) + 1
-      return acc
-    }, {})
+//     const cityMap = stays.reduce((acc, stay) => {
+//       const city = stay.loc?.city || 'Unknown'
+//       acc[city] = (acc[city] || 0) + 1
+//       return acc
+//     }, {})
 
-    console.log('\n📊 City counts:')
-    console.log(cityMap)
-  } catch (err) {
-    console.error("Error building city map:", err)
-  }
-}
+//     console.log('\n📊 City counts:')
+//     console.log(cityMap)
+//   } catch (err) {
+//     console.error("Error building city map:", err)
+//   }
+// }
 
-mapCities()
-  .then(() => process.exit(0))
-  .catch(() => process.exit(1))
+// mapCities()
+//   .then(() => process.exit(0))
+//   .catch(() => process.exit(1))
