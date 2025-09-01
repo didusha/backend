@@ -86,7 +86,6 @@ async function update(user) {
             _id: ObjectId.createFromHexString(user._id),
             username: user.username || '',
             fullname: user.fullname || '',
-			password: user.password || '',
             imgUrl: user.imgUrl || '',
 			isAdmin: user.isAdmin || false,
             isHost: user.isHost || false,
