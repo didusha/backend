@@ -68,6 +68,8 @@ export async function addOrder(req, res) {
 
 		// socketService.broadcast({ type: 'order-added', data: order, userId: loggedinUser._id })
 		socketService.emitToUser({ type: 'order-added', data: order, userId: order.host._id })
+		console.log('******',order.host._id);
+		
 
 		// const fullUser = await userService.getById(loggedinUser._id)
 		// socketService.emitTo({ type: 'user-updated', data: fullUser, label: fullUser._id })
@@ -91,11 +93,14 @@ export async function updateOrder(req, res) {
 	console.log("🚀 ~ updateOrder ~ order:", order)
 	try {
 		const updatedOrder = await orderService.update(order)
+		console.log('updatedOrder', updatedOrder );
+		
 
-		if (updatedOrder.status === 'Approved'){			
-			socketService.emitToUser({ type: 'order-confirm', data: updatedOrder, userId: updatedOrder.guest._id })
+		if (updatedOrder.status === 'Approved'){	
+			console.log(updatedOrder.status); 		
+			socketService.emitToUser({ type: 'order-confirm', data: updatedOrder, userId: order.guest._id })
 		}else{
-			socketService.emitToUser({ type: 'order-reject', data: updatedOrder, userId: updatedOrder.guest._id })
+			socketService.emitToUser({ type: 'order-reject', data: updatedOrder, userId: order.guest._id })
 		}
 
 		res.json(updatedOrder)
