@@ -110,7 +110,7 @@ async function add(order) {
       msgs: order.msgs,
       status: order.status
     }
-    console.log("🚀 ~ add ~ orderToAdd:", orderToAdd)
+    // console.log("🚀 ~ add ~ orderToAdd:", orderToAdd)
     const collection = await dbService.getCollection('order')
     await collection.insertOne(orderToAdd)
 
