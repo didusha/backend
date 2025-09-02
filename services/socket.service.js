@@ -5,10 +5,12 @@ var gIo = null
 
 export function setupSocketAPI(http) {
     gIo = new Server(http, {
-        cors: {
-            origin: '*',
-        }
-    })
+    cors: {
+        origin: ['http://localhost:5173', 'http://localhost:5174'],
+        methods: ['GET','POST'],
+        credentials: true
+    }
+})
     gIo.on('connection', socket => {
         logger.info(`New connected socket [id: ${socket.id}]`)
         socket.on('disconnect', socket => {
