@@ -17,12 +17,15 @@ export const stayService = {
 }
 
 async function query(filterBy = { txt: '', capacity: 1 }, sortBy) {
+
 	try {
+		const{page, limit} = filterBy
 		const criteria = _buildCriteria(filterBy)
 		const sort = _buildSort(sortBy)
+		const skip = ( page - 1) * limit
 
 		const collection = await dbService.getCollection('stay')
-		var stayCursor = await collection.find(criteria, {sort})
+		var stayCursor = await collection.find(criteria, {sort}).skip(skip).limit(limit)
 
 		// if (filterBy.pageIdx !== undefined) {
 		// 	stayCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
@@ -49,11 +52,11 @@ function _buildCriteria(filterBy) {
 	return criteria
 }
 
-function _buildSort(sortBy) {
+function _buildSort(sortBy) {	
     if (!sortBy.type) return {}
-    let type = sortBy.type   
+    let type = sortBy.type 
 
-  const dir = +sortBy.dir 
+  const dir = sortBy.dir 
   return { [type]: dir }
 }
 

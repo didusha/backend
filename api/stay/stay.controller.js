@@ -8,6 +8,13 @@ export async function getStays(req, res) {
 			txt: req.query.txt || '',
 			capacity: +req.query.capacity || 1,
 			hostId: req.query.hostId || '',
+			page: +req.query.page || 1,
+			limit: +req.query.limit || 10
+		}
+
+		const sortBy = {
+			type: req.query.type || '_id',
+			dir: +req.query.dir ||1
 		}
 
 		// console.log("🚀 ~ getStays ~ req.query:", req.query)
@@ -18,7 +25,7 @@ export async function getStays(req, res) {
 		// 	capacity: +req.query.capacity || null,
 		// 	price: +req.query.price || null,
 		// }
-		const stays = await stayService.query(filterBy, req.query)
+		const stays = await stayService.query(filterBy, sortBy)
 		res.json(stays)
 	} catch (err) {
 		logger.error('Failed to get stays', err)
