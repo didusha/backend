@@ -16,41 +16,7 @@ async function query(filterBy = {}) {
     const collection = await dbService.getCollection('order')
 
     var orders = await collection.find(criteria, { sort }).toArray()
-    // var orders = await collection.aggregate([
-    //     {
-    //         $match: criteria,
-    //     },
-    //     {
-    //         $lookup: {
-    //             localField: 'byUserId',
-    //             from: 'user',
-    //             foreignField: '_id',
-    //             as: 'byUser',
-    //         },
-    //     },
-    //     {
-    //         $unwind: '$byUser',
-    //     },
-    //     {
-    //         $lookup: {
-    //             localField: 'aboutUserId',
-    //             from: 'user',
-    //             foreignField: '_id',
-    //             as: 'aboutUser',
-    //         },
-    //     },
-    //     {
-    //         $unwind: '$aboutUser',
-    //     },
-    //     {
-    //         $project: {
-    //             'txt': true,
-    //             'byUser._id': true, 'byUser.fullname': true,
-    //             'aboutUser._id': true, 'aboutUser.fullname': true,
-    //         }
-    //     }
-    // ]).toArray()
-
+   
     return orders
   } catch (err) {
     logger.error('cannot get orders', err)
@@ -110,7 +76,7 @@ async function add(order) {
       msgs: order.msgs,
       status: order.status
     }
-    // console.log("🚀 ~ add ~ orderToAdd:", orderToAdd)
+
     const collection = await dbService.getCollection('order')
     await collection.insertOne(orderToAdd)
 
@@ -128,7 +94,6 @@ async function update(order) {
 
   try {
     const criteria = { _id: ObjectId.createFromHexString(order._id) }
-    // console.log("🚀 ~ update ~ criteria:", criteria)
 
     const collection = await dbService.getCollection('order')
     await collection.updateOne(criteria, { $set: orderToSave })
@@ -155,7 +120,8 @@ function _buildCriteria(filterBy) {
 }
 
 function _buildSort(filterBy) {
-  if (!filterBy.type) return {}
+  if (!filterBy || !filterBy.type) return { _id: -1 }
+
   let type = filterBy.type
 
   if (type === 'name') {
