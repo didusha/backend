@@ -6,9 +6,8 @@ var gIo = null
 export function setupSocketAPI(http) {
     gIo = new Server(http, {
     cors: {
-        origin: ['http://localhost:5173', 'http://localhost:5174'],
-        methods: ['GET','POST'],
-        credentials: true
+        origin: '*',
+        methods: ['GET','POST','PUT','DELETE'],
     }
 })
     gIo.on('connection', socket => {
