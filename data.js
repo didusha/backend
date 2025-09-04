@@ -1,32 +1,106 @@
 import { dbService } from '../backend/services/db.service.js'
 
-async function addWishlistToUsers() {
-  try {
-    const collection = await dbService.getCollection('user')
-    const users = await collection.find({}).toArray()
+function getRandomCoordInRio() {
+  const latCenter = -22.9068
+  const lngCenter = -43.1729
 
-    let updatedCount = 0
+  // מוסיפים סטייה קטנה אקראית (עד ~10 ק"מ)
+  const latOffset = (Math.random() - 0.5) * 0.2
+  const lngOffset = (Math.random() - 0.5) * 0.2
 
-    for (const user of users) {
-      // Only update if wishlist is missing
-      if (!user.wishlist) {
-        await collection.updateOne(
-          { _id: user._id },
-          { $set: { wishlist: [] } }
-        )
-        updatedCount++
-      }
-    }
-
-    console.log(`✅ Added wishlist to ${updatedCount} users successfully.`)
-  } catch (err) {
-    console.error("❌ Error updating users with wishlist:", err)
+  return {
+    lat: latCenter + latOffset,
+    lng: lngCenter + lngOffset,
   }
 }
 
-addWishlistToUsers()
+async function updateRioLocations() {
+  try {
+    const collection = await dbService.getCollection('stay')
+
+    // שים לב לרגקס מתוקן עם השם הנכון
+    const docs = await collection.find({ 'loc.city': /rio.*janeiro/i }).toArray()
+
+    let updatedCount = 0
+
+    for (const doc of docs) {
+      const { lat, lng } = getRandomCoordInRio()
+
+      await collection.updateOne(
+        { _id: doc._id },
+        { $set: { 'loc.lat': lat, 'loc.lng': lng } }
+      )
+
+      updatedCount++
+    }
+
+    console.log(`✅ Updated ${updatedCount} stays with Rio de Janeiro locations.`)
+  } catch (err) {
+    console.error("❌ Error updating Rio locations:", err)
+  }
+}
+
+updateRioLocations()
   .then(() => process.exit(0))
   .catch(() => process.exit(1))
+
+
+
+
+// import { dbService } from '../backend/services/db.service.js'
+// import { ObjectId } from 'mongodb'
+
+// function getRandomDateBetween(startYear, endYear) {
+//   const start = new Date(`${startYear}-01-01`).getTime()
+//   const end = new Date(`${endYear}-12-31`).getTime()
+//   const randomTimestamp = start + Math.random() * (end - start)
+//   return new Date(randomTimestamp)
+// }
+
+// async function randomizeOrderIds() {
+//   try {
+//     const collection = await dbService.getCollection('order')
+//     const orders = await collection.find({}).toArray()
+
+//     let updatedCount = 0
+
+//     for (const order of orders) {
+//       const randomDate = getRandomDateBetween(2016, 2025)
+//       const seconds = Math.floor(randomDate.getTime() / 1000)
+
+//       // בונים ObjectId חדש עם timestamp חדש
+//       const newId = new ObjectId(
+//         seconds.toString(16).padStart(8, '0') + // 4 bytes timestamp
+//         order._id.toHexString().substring(8)    // שומרים את שאר ה־bytes מה־id הישן
+//       )
+
+//       // עדכון ה־_id (צריך למחוק את הישן ולהכניס עם ה־id החדש)
+//       await collection.deleteOne({ _id: order._id })
+//       await collection.insertOne({ ...order, _id: newId })
+
+//       updatedCount++
+//     }
+
+//     console.log(`✅ Updated ${updatedCount} order IDs successfully.`)
+//   } catch (err) {
+//     console.error("❌ Error updating orders:", err)
+//   }
+// }
+
+// randomizeOrderIds()
+//   .then(() => process.exit(0))
+//   .catch(() => process.exit(1))
+
+
+
+
+
+
+
+
+
+
+
 
 
 

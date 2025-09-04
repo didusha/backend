@@ -14,7 +14,7 @@ export async function getStays(req, res) {
 
 		const sortBy = {
 			type: req.query.type || '_id',
-			dir: +req.query.dir ||1
+			dir: +req.query.dir || -1
 		}
 
 		// console.log("🚀 ~ getStays ~ req.query:", req.query)
